@@ -17,13 +17,17 @@ if len(logsList) == 0:
     print("No logs inside folder")
     exit()
 
-with open(logsList[0], "r") as f:
-    for lineEntry in f.readlines():
-        if GameJoiningEntry in lineEntry:
-            regexMatch = re.search(GameJoiningEntryPattern, lineEntry)
-            placeId = regexMatch.group(2)
-            jobId = regexMatch.group(1)
-
+placeId = None
+jobId = None
+for logFile in logsList: # incase the latest log file doesnt have a join entry
+    with open(logFile, "r") as f:
+        for lineEntry in f.readlines():
+            if GameJoiningEntry in lineEntry:
+                regexMatch = re.search(GameJoiningEntryPattern, lineEntry)
+                placeId = regexMatch.group(2)
+                jobId = regexMatch.group(1)
+    if placeId and jobId:
+        break # putting it up there in the for statement will only just stop the sequence
 intentLink = f"roblox://experiences/start?placeId={placeId}&gameInstanceId={jobId}"
 print(f"Latest Game:\nPlace ID: {placeId}\nJob ID: {jobId}\nIntent Link: {intentLink}")
 os.system(f"/system/bin/am start -a android.intent.action.VIEW -d '{intentLink}'")
